@@ -766,7 +766,7 @@ var updatesOn = true;
         background = images[0];
         sprites = images[1];
         reset();
-        Dom.storage.fast_lap_time = Dom.storage.fast_lap_time || 180;
+        Dom.storage.fast_lap_time = Dom.storage.fast_lap_time || 600;
         updateHud('fast_lap_time', formatTime(Util.toFloat(Dom.storage.fast_lap_time)));
       }
     });
