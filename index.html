@@ -85,10 +85,10 @@
   <script src="stats.js"></script>
   <script src="common.js"></script>
 <!-- =============================================================================
-GRAPHING LIBRARY
-https://github.com/chartjs/Chart.js
+ FUZZY LOGIC LIBRARY
+ https://github.com/Alendorff/fuzzyIS
 ============================================================================= -->
-<script src="node_modules/chart.js/dist/Chart.js"></script>
+<script src="fuzzyis-v1.0.0.js"></script>
   <script>
 
     var fps = 60;                      // how many 'update' frames per second
