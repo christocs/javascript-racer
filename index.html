@@ -279,22 +279,22 @@
       var autoPilotSystemOutput = autoPilotSystem.getPreciseOutput([playerX, closestCar.z - playerAbsoluteZ, playerX - closestCar.offset, speed]);
 
       //Display inputs/outputs for fuzzy logic system for 5% of ticks
-      // if (Math.random() > 0.95) {
-      //   console.log(
-      //     'inputs',
-      //     {
-      //       oldSpeed: speed,
-      //       oldXPos: playerX,
-      //       closestCarDistance: closestCar.z - playerAbsoluteZ,
-      //       closestCarOffset: closestCarOffset,
-      //     },
-      //     'outputs',
-      //     {
-      //       newDirection: autoPilotSystemOutput[0],
-      //       newAcceleration: autoPilotSystemOutput[1],
-      //     }
-      //   );
-      // }
+      if (Math.random() > 0.95) {
+        console.log(
+          'inputs',
+          {
+            oldSpeed: speed,
+            oldXPos: playerX,
+            closestCarDistance: closestCar.z - playerAbsoluteZ,
+            closestCarOffset: closestCarOffset,
+          },
+          'outputs',
+          {
+            newDirection: autoPilotSystemOutput[0],
+            newAcceleration: autoPilotSystemOutput[1],
+          }
+        );
+      }
 
       updateCars(dt, playerSegment, playerW);
 
