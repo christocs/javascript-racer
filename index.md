@@ -61,6 +61,12 @@
   <div id='instructions'>
     <p>Leave your hands free on autopilot!</p>
     <p>Or use the <b>arrow keys</b> to drive the car yourself.</p>
+    <div id='noCollisions'>
+        <p id='carCollisionsCurrentLap'></p>
+        <p id='wallCollisionsCurrentLap'></p>
+        <p id='carCollisionsLastLap'></p>
+        <p id='wallCollisionsLastLap'></p>
+      </div>
   </div>
 
   <div id="racer">
@@ -142,8 +148,7 @@
 
     var carCollision = true;               // Whether car collision is enabled/disabled
     var closestCar = { z: 999999999, offset: 0 };      // Closest car in terms of z position to the player
-    var noCarCollisions = 0;                 //Number of car collisions occured
-    var noWallCollisions = 0;                 //Number of wall collisions occured
+    var lapCollisions = [];
 
     var hud = {
       speed: { value: null, dom: Dom.get('speed_value') },
@@ -243,7 +248,6 @@
     //=========================================================================
     // UPDATE THE GAME WORLD
     //=========================================================================
-var updatesOn = true;
     function update(dt) {
 
       var n, car, carW, sprite, spriteW;
@@ -254,6 +258,10 @@ var updatesOn = true;
       var startPosition = position;
       var playerAbsoluteZ = playerZ + position;
       var closestCarOffset;
+
+      if (lapCollisions.length < 1) {
+        lapCollisions.push({car: 0, wall: 0});
+      }
 
       closestCar = { z: 999999999, offset: 0 };
       for (n = 0; n < cars.length; n++) {
@@ -271,22 +279,22 @@ var updatesOn = true;
       var autoPilotSystemOutput = autoPilotSystem.getPreciseOutput([playerX, closestCar.z - playerAbsoluteZ, playerX - closestCar.offset, speed]);
 
       //Display inputs/outputs for fuzzy logic system for 5% of ticks
-      if (Math.random() > 0.95) {
-        console.log(
-          'inputs',
-          {
-            oldSpeed: speed,
-            oldXPos: playerX,
-            closestCarDistance: closestCar.z - playerAbsoluteZ,
-            closestCarOffset: closestCarOffset,
-          },
-          'outputs',
-          {
-            newDirection: autoPilotSystemOutput[0],
-            newAcceleration: autoPilotSystemOutput[1],
-          }
-        );
-      }
+      // if (Math.random() > 0.95) {
+      //   console.log(
+      //     'inputs',
+      //     {
+      //       oldSpeed: speed,
+      //       oldXPos: playerX,
+      //       closestCarDistance: closestCar.z - playerAbsoluteZ,
+      //       closestCarOffset: closestCarOffset,
+      //     },
+      //     'outputs',
+      //     {
+      //       newDirection: autoPilotSystemOutput[0],
+      //       newAcceleration: autoPilotSystemOutput[1],
+      //     }
+      //   );
+      // }
 
       updateCars(dt, playerSegment, playerW);
 
@@ -322,7 +330,7 @@ var updatesOn = true;
           if (Util.overlap(playerX, playerW, sprite.offset + spriteW / 2 * (sprite.offset > 0 ? 1 : -1), spriteW)) {
             speed = maxSpeed / 5;
             position = Util.increase(playerSegment.p1.world.z, -playerZ, trackLength); // stop in front of sprite (at front of segment)
-            noWallCollisions += 1;
+            lapCollisions[lapCollisions.length - 1].wall += 1;
             console.log('Wall collision occured');
             break;
           }
@@ -334,13 +342,10 @@ var updatesOn = true;
           car = playerSegment.cars[n];
           carW = car.sprite.w * SPRITES.SCALE;
           if (speed > car.speed) {
-            //console.log('x', car.offset, 'z', car.z, 'playerZ', playerZ + position)
-            //console.log('distance', closestCar.z - playerAbsoluteZ);
-            //console.log('playerX', playerX, 'closestX', closestCar.offset);
             if (Util.overlap(playerX, playerW, car.offset, carW, 0.8)) {
               speed = car.speed * (car.speed / speed);
               position = Util.increase(car.z, -playerZ, trackLength);
-              noCarCollisions += 1;
+              lapCollisions[lapCollisions.length - 1].car += 1;
               console.log('Car collision occured');
               break;
             }
@@ -359,6 +364,10 @@ var updatesOn = true;
         if (currentLapTime && (startPosition < playerZ)) {
           lastLapTime = currentLapTime;
           currentLapTime = 0;
+
+          console.log('Lap completed! Lap collisions', lapCollisions);
+          lapCollisions.push({car: 0, wall: 0});
+
           if (lastLapTime <= Util.toFloat(Dom.storage.fast_lap_time)) {
             Dom.storage.fast_lap_time = lastLapTime;
             updateHud('fast_lap_time', formatTime(lastLapTime));
@@ -379,6 +388,17 @@ var updatesOn = true;
 
       updateHud('speed', 5 * Math.round(speed / 500));
       updateHud('current_lap_time', formatTime(currentLapTime));
+
+      //Update number of collisions displayed
+      Dom.set('carCollisionsCurrentLap', "<b>Current lap car collisions:</b> " +  lapCollisions[lapCollisions.length - 1].car);
+      Dom.set('wallCollisionsCurrentLap', "<b>Current lap wall collisions:</b> " +  lapCollisions[lapCollisions.length - 1].wall);
+      if (lapCollisions.length > 1) {
+        Dom.set('carCollisionsLastLap', "<b>Last lap car collisions:</b> " +  lapCollisions[lapCollisions.length - 2].car);
+        Dom.set('wallCollisionsLastLap', "<b>Last lap wall collisions:</b> " +  lapCollisions[lapCollisions.length - 2].wall);
+      } else {
+        Dom.set('carCollisionsLastLap', "");
+        Dom.set('wallCollisionsLastLap', "");
+      }
     }
 
     //-------------------------------------------------------------------------
