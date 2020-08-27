@@ -7,7 +7,7 @@ An Outrun-style pseudo-3d racing game in HTML5 and Javascript with fuzzy logic a
 
 Fuzzy logic AI implemented using fuzzy logic library [fuzzyIS](https://github.com/Alendorff/fuzzyIS) created by Maxim Nesterenko, using the [MIT](http://en.wikipedia.org/wiki/MIT_License) license..
 
- * [play the game](https://christocs.github.com/javascript-racer)
+ * [play the game](https://christocs.github.io/javascript-racer)
  * view the [source](https://github.com/christocs/javascript-racer)
  * read about [how it works](http://codeincomplete.com/posts/2012/6/22/javascript_racer/) (without AI)
 
